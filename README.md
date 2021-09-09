@@ -187,19 +187,19 @@ First Stage Boot Loader. Проект создается в директории
 linux, uboot и т.д. Далее необходимо создать символьные ссылки на репозитори, чтобы не дублировать каталоги 
 с исходниками. Для этого выполняем команду:
 
-***make src_links
+***make src_links***
 
 ## Генерация dts и сборка dtb
 
-***make zynq_dtb
+***make zynq_dtb***
 
 ## Генерация и сборка fsbl
 
-*** make fsbl ***
+***make fsbl***
 
 ## Генерация и сборка u-boot
 
-*** make uboot ***
+***make uboot***
 
 ## Генерация и сборка linux kernel
 
