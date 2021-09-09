@@ -48,7 +48,7 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
 Корневой каталог проекта содержит все набор файлов и скриптов для
 генерации соответствующих программных компонент.
 
- *** git clone https://github.com/insys-projects/osl-xilinx.git ***
+ ***git clone https://github.com/insys-projects/osl-xilinx.git***
     
 ## Описание основных файлов и каталогов проекта
 
