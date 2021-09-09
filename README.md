@@ -39,7 +39,7 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
 Если у вас отсутствует утилита gmake, то в качестве первого шага необходимо создать 
 символьную ссылку на **make**:
 
-*** cd /usr/bin && sudo ln -sv make gmake ***
+***cd /usr/bin && sudo ln -sv make gmake***
  
 так как утилитам Xilinx при обработке tcl-скрипта требуется gmake.
 
