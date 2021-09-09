@@ -1,0 +1,11 @@
+/dts-v1/;
+
+#include "zynqmp.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
+
+/ {
+    memory {
+        device_type = "memory";
+        reg = <0x0 0x0 0x0 0x7ff00000>, <0x00000008 0x00000000 0x00000001 0x80000000>;
+    };
+};

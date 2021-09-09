@@ -1,0 +1,61 @@
+/ {
+    model = "fmc133v";
+
+    aliases {
+        serial0 = &uart0;
+        ethernet0 = &gem2;
+    };
+
+    chosen {
+/*      bootargs = "console=ttyPS0,115200 earlyprintk root=/dev/nfs nfsroot=192.168.0.102:/tftpboot/nfsroot-fmc130e, tcp ip=dhcp rw";*/
+/*      ip=<client-IP-number>::<gateway-IP-number>:<netmask>:<client-hostname>:eth0:off */
+/*      bootargs = "console=ttyPS0,115200 earlyprintk root=/dev/nfs nfsroot=192.168.1.41:/tftpboot/nfsroot-fmc130e, tcp ip=192.168.1.44::192.168.1.1:255.255.255.0:fmc130e:eth0:off rw";*/
+/*      bootargs = "console=ttyPS0,115200 earlyprintk root=/dev/mmcblk0p2 rootfstype=ext4 nolock rw rootwait ip=dhcp"; */
+        bootargs = "console=ttyPS0,115200 earlyprintk root=/dev/mmcblk0p2 rootfstype=ext4 nolock rw rootwait cpuidle.off=1 ip=192.168.0.170::192.168.0.1:255.255.255.0:fmc130e:eth0:off";
+        stdout-path = "serial0:115200ns";
+    };
+
+    leds {
+        compatible = "gpio-leds";
+
+        GRN {
+            label = "GRN";
+            gpios = <&gpio 7 0>;
+            linux,default-trigger = "heartbeat";
+        };
+    };
+};
+
+&gem2 {
+    status = "disabled";
+    phy = <&phy2>;
+    phy-mode = "sgmii";
+    phy2: ethernet-phy@2 {
+        reg = <2>;
+    };
+};
+
+&gem3 {
+    status = "disabled";
+    phy = <&phy3>;
+    phy-mode = "sgmii";
+    phy3: ethernet-phy@3 {
+        reg = <3>;
+    };
+};
+
+&sdhci0 {
+        status = "okay";
+        bus-width = <4>;
+        max-frequency = <150000000>;
+        no-1-8-v;
+        disable-wp;
+};
+
+&uart0 {
+        status = "okay";
+};
+
+&uart1 {
+        status = "okay";
+};

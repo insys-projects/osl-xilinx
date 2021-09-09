@@ -1,0 +1,12 @@
+
+/ {
+        zdev_instance: zdev@40000000 {
+            status = "disabled";
+            compatible = "insys,lzynq";
+            #address-cells = <1>;
+            #size-cells = <1>;
+            reg = <0x40000000 0x80000 0x40080000 0x80000>;
+            interrupt-parent = <&intc>;
+            interrupts = <1 45 4>, <1 46 4>, <1 47 4>, <1 48 4>; // Actually - 61, 62, 63, 64. (start from 45 = 61-16)
+        };
+};

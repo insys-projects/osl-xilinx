@@ -1,0 +1,17 @@
+/dts-v1/;
+
+#include "fmc130e.dtsi"
+#include "fmc130e-zdev.dtsi"      /* Custom PL logic description file */
+
+&gem0 {
+    phy-handle = <&phy0>;
+    ps7_ethernet_0_mdio: mdio {
+        #address-cells = <0x1>;
+        #size-cells = <0x0>;
+        phy0: phy@0 { /* FMC130E v 1.2 */
+            compatible = "marvell,88e1510";
+            device_type = "ethernet-phy";
+            reg = <0>;
+        };
+    };
+};

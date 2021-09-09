@@ -1,0 +1,98 @@
+
+fsbl:
+	$(RM) -r $(BOARD)-xsa; \
+	$(MKDIR) -p $(BOARD)-xsa; \
+	cp ./src/*.$(EXT) $(BOARD)-xsa; \
+	$(TOOLS)/$(VERSION)/bin/xsct -eval "source xsct_script.tcl; fsbl -board $(BOARD)"
+	cp -fv $(BOARD)-fsbl/executable.elf $(BOARD)-fsbl/zynq_fsbl.elf;
+	cp -fv $(BOARD)-fsbl/executable.elf ./bin/zynq_fsbl.elf;
+
+zynq_dts:
+	$(RM) -r $(BOARD)-dts; \
+	$(MKDIR) $(BOARD)-dts; \
+	$(RM) -r $(BOARD)-xsa; \
+	$(MKDIR) -p $(BOARD)-xsa; \
+	cp -fv ./src/dtsi/$(BOARD)*.dtsi ./$(BOARD)-dts; \
+	cp -fv ./src/dts/$(BOARD)*$(BOARD_VER).dts ./$(BOARD)-dts; \
+	cp -fv ./src/*.$(EXT) $(BOARD)-xsa; \
+	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynq_dts -version $(VERSION) -board $(BOARD)"
+	if [[ -f $(BOARD)-dts/pcw.dtsi ]]; then \
+		mv $(BOARD)-dts/pcw.dtsi $(BOARD)-dts/$(BOARD)-pcw.dtsi; \
+		sed '/^#include "zynq-7000.dtsi"/a #include "$(BOARD)-pcw.dtsi"' $(BOARD)-dts/$(BOARD).dtsi > $(BOARD)-dts/$(BOARD).tmpdtsi; \
+		mv $(BOARD)-dts/$(BOARD).tmpdtsi $(BOARD)-dts/$(BOARD).dtsi; \
+	fi
+	if [[ -f $(BOARD)-dts/pl.dtsi ]];then \
+		mv $(BOARD)-dts/pl.dtsi $(BOARD)-dts/$(BOARD)-pl.dtsi; \
+		sed '/^#include "$(BOARD)-pcw.dtsi"/i #include "$(BOARD)-pl.dtsi"' $(BOARD)-dts/$(BOARD).dtsi > $(BOARD)-dts/$(BOARD).tmpdtsi; \
+		mv $(BOARD)-dts/$(BOARD).tmpdtsi $(BOARD)-dts/$(BOARD).dtsi; \
+	fi
+	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts;
+
+zynq_dtb: zynq_dts
+	$(RM) -r system.dtb; \
+	export PATH=$(shell pwd)/dtc:$$PATH; \
+	gcc -I $(BOARD)-dts -E -nostdinc -undef -D__DTS__ -x assembler-with-cpp -o $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dtx.tmp $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dts; \
+	dtc -I dts -O dtb -o ./bin/system.dtb $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dtx.tmp;
+	if [ -d "/tftpboot/$(BOARD)" ];then \
+	cp -fv ./bin/system.dtb /tftpboot/$(BOARD); \
+	fi
+
+uboot: zynq_dtb fsbl
+	cd u-boot-xlnx && git checkout arch/arm/dts/Makefile;
+	$(RM) -r $(BOARD)-u-boot; \
+	$(MKDIR) $(BOARD)-u-boot; \
+	sed  '/.*dtb-$$(CONFIG_ARCH_ZYNQ).* /a \\t$(BOARD)-$(BOARD_VER).dtb \\' u-boot-xlnx/arch/arm/dts/Makefile > u-boot-xlnx/arch/arm/dts/Makefile.tmpdts; \
+	mv u-boot-xlnx/arch/arm/dts/Makefile.tmpdts u-boot-xlnx/arch/arm/dts/Makefile; \
+	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts; \
+	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	export CROSS_COMPILE=arm-linux-gnueabihf-; \
+	export ARCH=arm; \
+	export CC=arm-linux-gnueabihf-gcc; \
+	export PATH=$$PATH:$(shell pwd)/dtc; \
+	$(MAKE) -C u-boot-xlnx O=$(shell pwd)/$(BOARD)-u-boot xilinx_zynq_virt_defconfig; \
+	export DEVICE_TREE="$(BOARD)-$(BOARD_VER)"; \
+	make -C $(BOARD)-u-boot -j 8;
+	cp -fv $(BOARD)-u-boot/u-boot.elf ./bin/u-boot.elf
+
+linux: uboot
+	$(RM) -r $(BOARD)-linux;
+	$(MKDIR) -p $(BOARD)-linux; \
+	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	export CROSS_COMPILE=arm-linux-gnueabihf-; \
+	export ARCH=arm; \
+	export CC=arm-linux-gnueabihf-gcc; \
+	export PATH=$$PATH:$(shell pwd)/dtc; \
+	$(MAKE) -C linux-xlnx O=$(shell pwd)/$(BOARD)-linux xilinx_zynq_defconfig; \
+	cd $(BOARD)-linux && $(MAKE) -j 8; cd ../;
+
+image.ub.sd:
+	cp -fv $(BOARD)-linux/arch/arm/boot/zImage ./bin; \
+	cp -fv ./src/kernel/arm/fit-kernel.its ./bin; \
+	cd ./bin && mkimage -f fit-kernel.its image.ub.sd; \
+	if [ -d "/tftpboot/$(BOARD)" ];then \
+	cp -fv image.ub.sd /tftpboot/$(BOARD); \
+	fi
+
+image.ub.ramfs:
+	cp -fv $(BOARD)-linux/arch/arm/boot/zImage ./bin; \
+	cp -fv ./src/kernel/arm/fit-kernel-full.its ./bin; \
+	cd ./bin && mkimage -f fit-kernel-full.its image.ub.ramfs; \
+	if [ -d "/tftpboot/$(BOARD)" ];then \
+	cp -fv image.ub.ramfs /tftpboot/$(BOARD); \
+	fi
+
+bitconv:
+	$(RM) -f ./bin/system.bit.bin; \
+	cp -fv $(BOARD)-xsa/*.bit ./bin/system.bit; \
+	cd ./bin; \
+	../bootgen/bootgen -w -image bitconv.bif -arch zynq -process_bitstream bin;
+	if [ -d "/tftpboot/$(BOARD)" ];then \
+	cp -fv ./bin/system.bit.bin /tftpboot/$(BOARD); \
+	fi
+
+boot.bin.tiny: uboot
+	cd ./bin; \
+	../bootgen/bootgen -image zynq-boot-tiny.bif -arch zynq -w -o i BOOT.BIN;
+	if [ -d "/tftpboot/$(BOARD)" ];then \
+	cp -fv ./bin/BOOT.BIN /tftpboot/$(BOARD); \
+	fi

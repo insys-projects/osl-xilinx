@@ -1,0 +1,6 @@
+/dts-v1/;
+
+#include "fmc144v.dtsi"
+
+/ {
+};

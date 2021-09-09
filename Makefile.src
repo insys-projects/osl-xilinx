@@ -1,0 +1,71 @@
+
+update_src:
+	if [ -d "$(SRC_DIR)/bootgen" ];then \
+	cd $(SRC_DIR)/bootgen && git pull origin master; \
+	$(MAKE) -j8 -C $(SRC_DIR)/bootgen; \
+	fi
+	if [ -d "$(SRC_DIR)/linux-xlnx" ];then \
+	cd $(SRC_DIR)/linux-xlnx && git pull origin master && git checkout $(SRC_VER); \
+	fi
+	if [ -d "$(SRC_DIR)/dts" ];then \
+	cd $(SRC_DIR)/dts/device-tree-xlnx && git pull origin master && git checkout $(SRC_VER); \
+	fi
+	if [ -d "$(SRC_DIR)/u-boot-xlnx" ];then \
+	cd $(SRC_DIR)/u-boot-xlnx && git pull origin master && git checkout $(SRC_VER); \
+	fi
+	if [ -d "$(SRC_DIR)/arm-trusted-firmware" ];then \
+	cd $(SRC_DIR)/arm-trusted-firmware && git pull origin master && git checkout $(SRC_VER); \
+	fi
+	if [ -d "$(SRC_DIR)/dtc" ];then \
+	cd $(SRC_DIR)/dtc && git pull origin master && git checkout master; \
+	$(MAKE) -C $(SRC_DIR)/dtc; \
+	fi
+
+get_sources:
+	$(MKDIR) -p $(SRC_DIR);
+	if [ ! -d "$(SRC_DIR)/bootgen" ];then \
+	git clone https://github.com/Xilinx/bootgen $(SRC_DIR)/bootgen; \
+	$(MAKE) -j8 -C $(SRC_DIR)/bootgen; \
+	fi
+	if [ ! -d "$(SRC_DIR)/linux-xlnx" ];then \
+	git clone https://github.com/Xilinx/linux-xlnx $(SRC_DIR)/linux-xlnx; \
+	cd $(SRC_DIR)/linux-xlnx && git checkout $(SRC_VER); \
+	fi
+	if [ ! -d "$(SRC_DIR)/dts" ];then \
+	mkdir -p $(SRC_DIR)/dts; cd $(SRC_DIR)/dts; git clone https://github.com/Xilinx/device-tree-xlnx $(SRC_DIR)/dts/device-tree-xlnx; \
+	cd $(SRC_DIR)/dts/device-tree-xlnx; git checkout $(SRC_VER); \
+	fi
+	if [ ! -d "$(SRC_DIR)/u-boot-xlnx" ];then \
+	git clone https://github.com/Xilinx/u-boot-xlnx $(SRC_DIR)/u-boot-xlnx; \
+	cd $(SRC_DIR)/u-boot-xlnx && git checkout $(SRC_VER); \
+	fi
+	if [ ! -d "$(SRC_DIR)/arm-trusted-firmware" ];then \
+	git clone https://github.com/Xilinx/arm-trusted-firmware $(SRC_DIR)/arm-trusted-firmware; \
+	cd $(SRC_DIR)/arm-trusted-firmware && git checkout $(SRC_VER); \
+	fi
+	if [ ! -d "$(SRC_DIR)/dtc" ];then \
+	git clone https://git.kernel.org/pub/scm/utils/dtc/dtc.git $(SRC_DIR)/dtc; \
+	$(MAKE) -C $(SRC_DIR)/dtc; \
+	fi
+
+src_links:
+	if [ -d "$(SRC_DIR)/bootgen" ];then \
+	ln -svf $(SRC_DIR)/bootgen bootgen; \
+	fi
+	if [ -d "$(SRC_DIR)/linux-xlnx" ];then \
+	ln -svf $(SRC_DIR)/linux-xlnx linux-xlnx; \
+	fi
+	if [ -d "$(SRC_DIR)/dts" ];then \
+	ln -svf $(SRC_DIR)/dts dts; \
+	fi
+	if [ -d "$(SRC_DIR)/u-boot-xlnx" ];then \
+	ln -svf $(SRC_DIR)/u-boot-xlnx u-boot-xlnx; \
+	fi
+ifeq ($(SOC_TYPE),zynqmp)
+	if [ -d "$(SRC_DIR)/arm-trusted-firmware" ];then \
+	ln -svf $(SRC_DIR)/arm-trusted-firmware arm-trusted-firmware; \
+	fi
+endif
+	if [ -d "$(SRC_DIR)/dtc" ];then \
+	ln -svf $(SRC_DIR)/dtc dtc; \
+	fi

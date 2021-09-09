@@ -1,0 +1,17 @@
+
+/ {
+    axidev@83C00000 {
+        status = "okay";
+        compatible = "insys,axidrv";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        reg = <0x83C00000 0x10000>;
+        node-labels =
+                "axi_dma_0",
+                "axi_dma_1";
+        node-handles = <
+                &axi_dma_0
+                &axi_dma_1
+        >;
+     };
+};

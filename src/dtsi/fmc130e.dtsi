@@ -1,0 +1,117 @@
+/dts-v1/;
+
+#include "zynq-7000.dtsi"
+
+/ {
+        model = "fmc130e";
+        compatble = "insys,fmc130e", "xlnx,zynq-7000";
+
+        aliases {
+            serial0 = &uart0;
+            serial1 = &uart1;
+/*            serial2 = &mdm_0; */
+            ethernet0 = &gem0;
+            spi0 = &qspi;
+        };
+
+        chosen {
+            bootargs = "console=ttyPS0,115200 earlycon root=/dev/mmcblk0p2 rootfstype=ext4 nolock rw rootwait ip=192.168.0.101::192.168.0.1:255.255.255.0:fmc130e:eth0:on";
+            stdout-path = "serial0:115200n8";
+        };
+
+        memory {
+                device_type = "memory";
+                reg = <0x0 0x40000000>;
+        };
+
+        leds {
+            compatible = "gpio-leds";
+
+            heartbeat_led {
+                status = "okay";
+                label = "heartbeat";
+                gpios = <&gpio0 46 0>;
+                linux,default-trigger = "heartbeat";
+            };
+        };
+
+        chip_pin {
+            label = "chip_pin";
+            gpios = <&gpio0 49 0>;
+            default-state = "off";
+        };
+
+        sd_sel {
+            label = "sd_sel";
+            gpios = <&gpio0 48 0>;
+            default-state = "off";
+        };
+
+        usb_phy0: phy0@e0002000 {
+                compatible = "ulpi-phy";
+                #phy-cells = <0>;
+                reg = <0xe0002000 0x1000>;
+                view-port = <0x0170>;
+                drv-vbus;
+        };
+
+        dcc: dcc {
+            compatible = "arm,dcc";
+            status = "disabled";
+            u-boot,dm-pre-reloc;
+        };
+};
+
+&clkc {
+    fclk-enable = <0xf>;
+    ps-clk-frequency = <50000000>;
+};
+
+&usb0 {
+    status = "okay";
+    usb-phy = <&usb_phy0>;
+    phy_type = "ulpi";
+    dr_mode = "host";
+};
+
+&uart0 {
+    status = "okay";
+};
+
+&uart1 {
+    status = "okay";
+};
+
+&mdm_0 {
+    status = "disabled";
+};
+
+&axi_pcie_0 {
+    status = "disabled";
+};
+
+&qspi {
+
+    flash0: flash@0 {
+        compatible = "n25q512a", "micron,m25p80";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        spi-max-frequency = <50000000>;
+        partition@0 {
+            label = "boot";
+            reg = <0x00000000 0x00200000>;
+        };
+        partition@1 {
+            label = "bootenv";
+            reg = <0x00200000 0x00020000>;
+        };
+        partition@2 {
+            label = "kernel";
+            reg = <0x00220000 0x00d80000>;
+        };
+        partition@3 {
+            label = "spare";
+            reg = <0x00fa0000 0x00000000>;
+        };
+    };
+};
