@@ -31,14 +31,15 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
 - **Vivado 2020.2**
 - **git**
 - **sed**
-- **make** ....
+- **make**
+- **mkimage**
     
 # Подготовка среды для работы
 
 Если у вас отсутствует утилита gmake, то в качестве первого шага необходимо создать 
 символьную ссылку на **make**:
 
- *** cd /usr/bin && sudo ln -sv make gmake ***
+*** cd /usr/bin && sudo ln -sv make gmake ***
  
 так как утилитам Xilinx при обработке tcl-скрипта требуется gmake.
 
@@ -86,7 +87,7 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
     │           └── fit-kernel.its
     └── xsct_script.tcl             - файл для генерации программных компонент Xilinx
 ```
-## Описание основных параметров *Makefile*
+# Описание основных параметров *Makefile*
 
 Структура *Makefile* верхнего уровня приведена ниже:
 
@@ -132,7 +133,7 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
 
 - **SRC_VER** - версия исходных текстов на которую переключтся git-репозиторий.
 
-## Описание *Makefile.src*
+# Описание *Makefile.src*
 
 В **Makefile.src** определяются следущие цели:
 
@@ -145,7 +146,7 @@ Yocto Project и OpenEmbedded. При этом вы получаете на вы
 
 - **update_src** - обновить исходники и переключить их версии на **SRC_VER**.
 
-## Описание *Makefile.zynq*
+# Описание *Makefile.zynq*
 
 В **Makefile.zynq** определяются следущие цели:
 
@@ -173,8 +174,48 @@ First Stage Boot Loader. Проект создается в директории
 - **image.ub.ramfs** -
 - **image.ub.sd** -
 
+# Сборка компонент
+
+## Подготовка дерева исходных текстов
+
+Устанавливаем в Makefile переменные *SRC_DIR* и *SRC_VER*. Устанавливаем тип файла проекта *HDF_EXT*.
+Выполняем команду:
+
+*** make get_sources ***
+    
+После выполнения в директории *SRC_DIR* будут находится клонированные репозитории с исходными текстами 
+linux, uboot и т.д. Далее необходимо создать символьные ссылки на репозитори, чтобы не дублировать каталоги 
+с исходниками. Для этого выполняем команду:
+
+*** make src_links ***
+
+## Генерация dts и сборка dtb
+
+*** make zynq_dtb ***
+
+## Генерация и сборка fsbl
+
+*** make fsbl ***
+
+## Генерация и сборка u-boot
+
+*** make uboot ***
+
+## Генерация и сборка linux kernel
+
+*** make linux ***
+
+## Генерация image.ub.sd
+
+*** make image.ub.sd ***
+
+## Генерация BOOT.BIN
+
+*** make boot.bin.tiny ***
+
+Полученный файл **BOOT.BIN** содержит только: **zynq_fsbl.elf** и **u-boot.elf**
+
 ## Описание *Makefile.zynqmp*
 
 В **Makefile.zynqmp** определяются следущие цели:
 
-## Описание *Makefile.zynqmp*
