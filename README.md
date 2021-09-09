@@ -181,7 +181,7 @@ First Stage Boot Loader. Проект создается в директории
 Устанавливаем в Makefile переменные *SRC_DIR* и *SRC_VER*. Устанавливаем тип файла проекта *HDF_EXT*.
 Выполняем команду:
 
-***make get_sources
+***make get_sources***
     
 После выполнения в директории *SRC_DIR* будут находится клонированные репозитории с исходными текстами 
 linux, uboot и т.д. Далее необходимо создать символьные ссылки на репозитори, чтобы не дублировать каталоги 
@@ -203,15 +203,15 @@ linux, uboot и т.д. Далее необходимо создать симво
 
 ## Генерация и сборка linux kernel
 
-*** make linux ***
+***make linux***
 
 ## Генерация image.ub.sd
 
-*** make image.ub.sd ***
+***make image.ub.sd***
 
 ## Генерация BOOT.BIN
 
-*** make boot.bin.tiny ***
+***make boot.bin.tiny***
 
 Полученный файл **BOOT.BIN** содержит только: **zynq_fsbl.elf** и **u-boot.elf**
 
