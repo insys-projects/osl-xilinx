@@ -4,8 +4,8 @@ update_src:
 	cd $(SRC_DIR)/bootgen && git pull origin master; \
 	$(MAKE) -j8 -C $(SRC_DIR)/bootgen; \
 	fi
-	if [ -d "$(SRC_DIR)/linux-xlnx" ];then \
-	cd $(SRC_DIR)/linux-xlnx && git pull origin master && git checkout $(SRC_VER); \
+	if [ -d "$(SRC_DIR)/$(SRC_KERNEL_NAME)" ];then \
+	cd $(SRC_DIR)/$(SRC_KERNEL_NAME) && git pull origin master && git checkout $(SRC_VER); \
 	fi
 	if [ -d "$(SRC_DIR)/dts" ];then \
 	cd $(SRC_DIR)/dts/device-tree-xlnx && git pull origin master && git checkout $(SRC_VER); \
@@ -27,9 +27,9 @@ get_sources:
 	git clone https://github.com/Xilinx/bootgen $(SRC_DIR)/bootgen; \
 	$(MAKE) -j8 -C $(SRC_DIR)/bootgen; \
 	fi
-	if [ ! -d "$(SRC_DIR)/linux-xlnx" ];then \
-	git clone https://github.com/Xilinx/linux-xlnx $(SRC_DIR)/linux-xlnx; \
-	cd $(SRC_DIR)/linux-xlnx && git checkout $(SRC_VER); \
+	if [ ! -d "$(SRC_DIR)/$(SRC_KERNEL_NAME)" ];then \
+	git clone $(SRC_KERNEL_LINK)/$(SRC_KERNEL_NAME) $(SRC_DIR)/$(SRC_KERNEL_NAME); \
+	cd $(SRC_DIR)/$(SRC_KERNEL_NAME) && git checkout $(SRC_VER); \
 	fi
 	if [ ! -d "$(SRC_DIR)/dts" ];then \
 	mkdir -p $(SRC_DIR)/dts; cd $(SRC_DIR)/dts; git clone https://github.com/Xilinx/device-tree-xlnx $(SRC_DIR)/dts/device-tree-xlnx; \
@@ -52,8 +52,8 @@ src_links:
 	if [ -d "$(SRC_DIR)/bootgen" ];then \
 	ln -svf $(SRC_DIR)/bootgen bootgen; \
 	fi
-	if [ -d "$(SRC_DIR)/linux-xlnx" ];then \
-	ln -svf $(SRC_DIR)/linux-xlnx linux-xlnx; \
+	if [ -d "$(SRC_DIR)/$(SRC_KERNEL_NAME)" ];then \
+	ln -svf $(SRC_DIR)/$(SRC_KERNEL_NAME) $(SRC_KERNEL_NAME); \
 	fi
 	if [ -d "$(SRC_DIR)/dts" ];then \
 	ln -svf $(SRC_DIR)/dts dts; \

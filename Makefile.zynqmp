@@ -47,7 +47,7 @@ zynqmp_dts:
 	fi
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts;
 
-zynqmp_dtb: zynqmp_dts fix_dts
+zynqmp_dtb: zynqmp_dts
 	$(RM) -r system.dtb; \
 	export PATH=$(shell pwd)/dtc:$$PATH; \
 	gcc -I $(BOARD)-dts -E -nostdinc -undef -D__DTS__ -x assembler-with-cpp -o $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dtx.tmp $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dts; \
@@ -55,7 +55,7 @@ zynqmp_dtb: zynqmp_dts fix_dts
 	cp -fv system.dtb ./bin;
 	cp -fv system.dtb /tftpboot/$(BOARD)
 
-uboot-mp: zynqmp_dts fix_dts fsblmp atf pmufw
+uboot-mp: zynqmp_dts fsblmp atf pmufw
 	cd u-boot-xlnx && git checkout arch/arm/dts/Makefile;
 	$(RM) -r $(BOARD)-u-boot; \
 	$(MKDIR) $(BOARD)-u-boot; \
@@ -75,9 +75,13 @@ uboot-mp: zynqmp_dts fix_dts fsblmp atf pmufw
 linux-mp: uboot-mp
 	$(RM) -r $(BOARD)-linux;
 	$(MKDIR) -p $(BOARD)-linux; \
-	source ./xenv.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	export CROSS_COMPILE=aarch64-linux-gnu-; \
+	export ARCH=aarch64; \
+	export CC=aarch64-linux-gnu-gcc; \
+	export PATH=$$PATH:$(shell pwd)/dtc; \
 	export ARCH=arm64; \
-	$(MAKE) -C linux-xlnx O=$(shell pwd)/$(BOARD)-linux xilinx_zynqmp_defconfig; \
+	$(MAKE) -C $(SRC_KERNEL_NAME) O=$(shell pwd)/$(BOARD)-linux xilinx_zynqmp_defconfig; \
 	cd $(BOARD)-linux && $(MAKE) -j 8; cd ../;
 
 image.ub.sd:

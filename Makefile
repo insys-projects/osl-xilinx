@@ -15,9 +15,18 @@ TOOLS ?= $(TOOLS_ROOT)/Vitis
 VERSION ?= 2020.2
 MAKE := make
 MKDIR := mkdir
+
 SRC_DIR := $(HOME)/xilsrc
+
+SRC_KERNEL_LINK := https://github.com/Xilinx
+SRC_KERNEL_NAME := linux-xlnx
+
+#SRC_KERNEL_LINK := https://github.com/analogdevicesinc
+#SRC_KERNEL_NAME := linux.git
+
 #SRC_VER := xilinx-v$(VERSION)
 SRC_VER := master
+
 EXT := $(HDF_EXT)
 
 include Makefile.$(SOC_TYPE)

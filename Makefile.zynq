@@ -62,7 +62,10 @@ linux: uboot
 	export ARCH=arm; \
 	export CC=arm-linux-gnueabihf-gcc; \
 	export PATH=$$PATH:$(shell pwd)/dtc; \
-	$(MAKE) -C linux-xlnx O=$(shell pwd)/$(BOARD)-linux xilinx_zynq_defconfig; \
+	if [ -f "src/kernel/arm/kernel_defconfig_add" ];then \
+	cat src/kernel/arm/kernel_defconfig_add >> ./linux.git/arch/arm/configs/xilinx_zynq_defconfig; \
+	fi; \
+	$(MAKE) -C $(SRC_KERNEL_NAME) O=$(shell pwd)/$(BOARD)-linux xilinx_zynq_defconfig; \
 	cd $(BOARD)-linux && $(MAKE) -j 8; cd ../;
 
 image.ub.sd:
