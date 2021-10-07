@@ -1,22 +1,25 @@
 
-BOARD ?= fmc130e
-BOARD_VER ?= v12
+#BOARD ?= fmc130e
+#BOARD_VER ?= v12
 #BOARD ?= fmc133v
 #BOARD_VER ?= v12
-#BOARD ?= fmc138m
-#BOARD_VER ?= v11
+BOARD ?= fmc138m
+BOARD_VER ?= v11
 
-SOC_TYPE ?= zynq
+#SOC_TYPE ?= zynq
+SOC_TYPE ?= zynqmp
 HDF_EXT ?= xsa
 
 SHELL := /bin/bash
 TOOLS_ROOT ?= /opt/xilinx
 TOOLS ?= $(TOOLS_ROOT)/Vitis
-VERSION ?= 2020.2
+TOOLS_VERSION ?= 2020.2
+DTS_VERSION ?= 2021.1
 MAKE := make
 MKDIR := mkdir
 
 SRC_DIR := $(HOME)/xilsrc
+#SRC_DIR := $(HOME)/xilinx-sdk-tools
 
 SRC_KERNEL_LINK := https://github.com/Xilinx
 SRC_KERNEL_NAME := linux-xlnx

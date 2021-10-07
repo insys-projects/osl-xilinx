@@ -1,14 +1,14 @@
 
 pmufw:
 	$(RM) -r $(BOARD)-pmufw; \
-	$(TOOLS)/$(VERSION)/bin/xsct -eval "source xsct_script.tcl; pmufw -board $(BOARD)"; \
+	$(TOOLS)/$(TOOLS_VERSION)/bin/xsct -eval "source xsct_script.tcl; pmufw -board $(BOARD)"; \
 	cp -fv $(BOARD)-pmufw/executable.elf ./bin/pmufw.elf
 
 atf:
 	$(RM) -r $(BOARD)-atf; \
 	$(MKDIR) -p $(BOARD)-atf; \
 	$(MAKE) -C arm-trusted-firmware distclean; \
-	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=aarch64-none-elf-; \
 	$(MAKE) -C arm-trusted-firmware DEBUG=0 RESET_TO_BL31=1 PLAT=zynqmp bl31;
 	cp -fv arm-trusted-firmware/build/zynqmp/release/bl31/bl31.elf ./bin/bl31.elf
@@ -18,7 +18,7 @@ fsblmp:
 	$(RM) -r $(BOARD)-xsa; \
 	$(MKDIR) -p $(BOARD)-xsa; \
 	cp ./src/*.$(EXT) $(BOARD)-xsa; \
-	$(TOOLS)/$(VERSION)/bin/xsct -eval "source xsct_script.tcl; fsblmp -board $(BOARD)"
+	$(TOOLS)/$(TOOLS_VERSION)/bin/xsct -eval "source xsct_script.tcl; fsblmp -board $(BOARD)"
 	cp -fv $(BOARD)-fsblmp/executable.elf $(BOARD)-fsblmp/zynqmp_fsbl.elf;
 	cp -fv $(BOARD)-fsblmp/executable.elf ./bin/zynqmp_fsbl.elf;
 
@@ -30,7 +30,7 @@ zynqmp_dts:
 	cp -fv ./src/dtsi/$(BOARD)*.dtsi ./$(BOARD)-dts; \
 	cp -fv ./src/dts/$(BOARD)*.dts ./$(BOARD)-dts; \
 	cp -fv ./src/*.$(EXT) $(BOARD)-xsa; \
-	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynqmp_dts -version $(VERSION) -board $(BOARD)"
+	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynqmp_dts -version $(DTS_VERSION) -board $(BOARD)"
 	if [[ -f $(BOARD)-dts/pcw.dtsi ]]; then \
 		mv $(BOARD)-dts/pcw.dtsi $(BOARD)-dts/$(BOARD)-pcw.dtsi; \
 		sed '/^#include "zynqmp-clk-ccf.dtsi"/a #include "$(BOARD)-pcw.dtsi"' $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dts > $(BOARD)-dts/$(BOARD)-$(BOARD_VER).tmpdts; \
@@ -62,7 +62,7 @@ uboot-mp: zynqmp_dts fsblmp atf pmufw
 	sed  '/.*dtb-$$(CONFIG_ARCH_ZYNQMP).* /a \\t$(BOARD)-$(BOARD_VER).dtb \\' u-boot-xlnx/arch/arm/dts/Makefile > u-boot-xlnx/arch/arm/dts/Makefile.tmpdts; \
 	mv u-boot-xlnx/arch/arm/dts/Makefile.tmpdts u-boot-xlnx/arch/arm/dts/Makefile; \
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts; \
-	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=aarch64-linux-gnu-; \
 	export ARCH=aarch64; \
 	export CC=aarch64-linux-gnu-gcc; \
@@ -72,12 +72,11 @@ uboot-mp: zynqmp_dts fsblmp atf pmufw
 	make -C $(BOARD)-u-boot -j 8;
 	cp -fv $(BOARD)-u-boot/u-boot.elf ./bin/u-boot.elf
 
-linux-mp: uboot-mp
+linux-mp:
 	$(RM) -r $(BOARD)-linux;
 	$(MKDIR) -p $(BOARD)-linux; \
-	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=aarch64-linux-gnu-; \
-	export ARCH=aarch64; \
 	export CC=aarch64-linux-gnu-gcc; \
 	export PATH=$$PATH:$(shell pwd)/dtc; \
 	export ARCH=arm64; \
@@ -102,9 +101,13 @@ bitconvmp:
 	cp -fv ./bootgen/bootgen ./bin; \
 	cd ./bin && ./bootgen -w -image bitconv.bif -arch zynqmp -process_bitstream bin;
 
-boot.bin.tiny: uboot-mp
+boot.bin.tiny:
 	cd ./bin; \
 	../bootgen/bootgen -image zynqmp-boot-tiny.bif -arch zynqmp -w -o i BOOT.BIN;
+
+boot.bin.pl:
+	cd ./bin; \
+	../bootgen/bootgen -image zynqmp-boot-tiny-pl.bif -arch zynqmp -w -o i BOOT.BIN;
 
 #
 # Для версии 2020.2 в dts используется serdes а в новых версиях psgtr

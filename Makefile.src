@@ -8,7 +8,7 @@ update_src:
 	cd $(SRC_DIR)/$(SRC_KERNEL_NAME) && git pull origin master && git checkout $(SRC_VER); \
 	fi
 	if [ -d "$(SRC_DIR)/dts" ];then \
-	cd $(SRC_DIR)/dts/device-tree-xlnx && git pull origin master && git checkout $(SRC_VER); \
+	cd $(SRC_DIR)/dts/device-tree-xlnx && git pull origin master && git checkout xilinx_v$(DTS_VERSION); \
 	fi
 	if [ -d "$(SRC_DIR)/u-boot-xlnx" ];then \
 	cd $(SRC_DIR)/u-boot-xlnx && git pull origin master && git checkout $(SRC_VER); \

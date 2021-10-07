@@ -3,7 +3,7 @@ fsbl:
 	$(RM) -r $(BOARD)-xsa; \
 	$(MKDIR) -p $(BOARD)-xsa; \
 	cp ./src/*.$(EXT) $(BOARD)-xsa; \
-	$(TOOLS)/$(VERSION)/bin/xsct -eval "source xsct_script.tcl; fsbl -board $(BOARD)"
+	$(TOOLS)/$(TOOLS_VERSION)/bin/xsct -eval "source xsct_script.tcl; fsbl -board $(BOARD)"
 	cp -fv $(BOARD)-fsbl/executable.elf $(BOARD)-fsbl/zynq_fsbl.elf;
 	cp -fv $(BOARD)-fsbl/executable.elf ./bin/zynq_fsbl.elf;
 
@@ -15,7 +15,7 @@ zynq_dts:
 	cp -fv ./src/dtsi/$(BOARD)*.dtsi ./$(BOARD)-dts; \
 	cp -fv ./src/dts/$(BOARD)*$(BOARD_VER).dts ./$(BOARD)-dts; \
 	cp -fv ./src/*.$(EXT) $(BOARD)-xsa; \
-	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynq_dts -version $(VERSION) -board $(BOARD)"
+	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynq_dts -version $(DTS_VERSION) -board $(BOARD)"
 	if [[ -f $(BOARD)-dts/pcw.dtsi ]]; then \
 		mv $(BOARD)-dts/pcw.dtsi $(BOARD)-dts/$(BOARD)-pcw.dtsi; \
 		sed '/^#include "zynq-7000.dtsi"/a #include "$(BOARD)-pcw.dtsi"' $(BOARD)-dts/$(BOARD).dtsi > $(BOARD)-dts/$(BOARD).tmpdtsi; \
@@ -44,7 +44,7 @@ uboot: zynq_dtb fsbl
 	sed  '/.*dtb-$$(CONFIG_ARCH_ZYNQ).* /a \\t$(BOARD)-$(BOARD_VER).dtb \\' u-boot-xlnx/arch/arm/dts/Makefile > u-boot-xlnx/arch/arm/dts/Makefile.tmpdts; \
 	mv u-boot-xlnx/arch/arm/dts/Makefile.tmpdts u-boot-xlnx/arch/arm/dts/Makefile; \
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts; \
-	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=arm-linux-gnueabihf-; \
 	export ARCH=arm; \
 	export CC=arm-linux-gnueabihf-gcc; \
@@ -57,7 +57,7 @@ uboot: zynq_dtb fsbl
 linux: uboot
 	$(RM) -r $(BOARD)-linux;
 	$(MKDIR) -p $(BOARD)-linux; \
-	source $(TOOLS_ROOT)/Vivado/$(VERSION)/settings64.sh; \
+	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=arm-linux-gnueabihf-; \
 	export ARCH=arm; \
 	export CC=arm-linux-gnueabihf-gcc; \
