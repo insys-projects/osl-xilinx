@@ -1,0 +1,17 @@
+
+/ {
+    axidev@b0000000 {
+        status = "disabled";
+        compatible = "insys,axidrv";
+        #address-cells = <2>;
+        #size-cells = <2>;
+        reg = <0x0 0xb0000000 0x0 0x100000>;
+        node-labels =
+                "axi_dma_0",
+                "axi_dma_1";
+        node-handles = <
+                &axi_dma_0
+                &axi_dma_1
+        >;
+     };
+};

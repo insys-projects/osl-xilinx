@@ -28,6 +28,7 @@ zynqmp_dts:
 	$(RM) -r $(BOARD)-xsa; \
 	$(MKDIR) -p $(BOARD)-xsa; \
 	cp -fv ./src/dtsi/$(BOARD)*.dtsi ./$(BOARD)-dts; \
+	cp -fv ./src/dtsi/zynqmp-zdev.dtsi ./$(BOARD)-dts; \
 	cp -fv ./src/dts/$(BOARD)*.dts ./$(BOARD)-dts; \
 	cp -fv ./src/*.$(EXT) $(BOARD)-xsa; \
 	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynqmp_dts -version $(DTS_VERSION) -board $(BOARD)"
@@ -47,7 +48,7 @@ zynqmp_dts:
 	fi
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts;
 
-zynqmp_dtb: zynqmp_dts
+zynqmp_dtb: zynqmp_dts fix_dts
 	$(RM) -r system.dtb; \
 	export PATH=$(shell pwd)/dtc:$$PATH; \
 	gcc -I $(BOARD)-dts -E -nostdinc -undef -D__DTS__ -x assembler-with-cpp -o $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dtx.tmp $(BOARD)-dts/$(BOARD)-$(BOARD_VER).dts; \
@@ -62,6 +63,7 @@ uboot-mp: zynqmp_dts fsblmp atf pmufw
 	sed  '/.*dtb-$$(CONFIG_ARCH_ZYNQMP).* /a \\t$(BOARD)-$(BOARD_VER).dtb \\' u-boot-xlnx/arch/arm/dts/Makefile > u-boot-xlnx/arch/arm/dts/Makefile.tmpdts; \
 	mv u-boot-xlnx/arch/arm/dts/Makefile.tmpdts u-boot-xlnx/arch/arm/dts/Makefile; \
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts; \
+	cp -fv $(BOARD)-dts/*-zdev.dts* u-boot-xlnx/arch/arm/dts; \
 	source $(TOOLS_ROOT)/Vivado/$(TOOLS_VERSION)/settings64.sh; \
 	export CROSS_COMPILE=aarch64-linux-gnu-; \
 	export ARCH=aarch64; \
@@ -104,6 +106,10 @@ bitconvmp:
 boot.bin.tiny:
 	cd ./bin; \
 	../bootgen/bootgen -image zynqmp-boot-tiny.bif -arch zynqmp -w -o i BOOT.BIN;
+
+boot.bin.scr:
+	cd ./bin; \
+	../bootgen/bootgen -image zynqmp-boot-tiny-scr.bif -arch zynqmp -w -o i BOOT.BIN;
 
 boot.bin.pl:
 	cd ./bin; \

@@ -4,7 +4,7 @@
 #BOARD ?= fmc133v
 #BOARD_VER ?= v12
 BOARD ?= fmc138m
-BOARD_VER ?= v11
+BOARD_VER ?= v12
 
 #SOC_TYPE ?= zynq
 SOC_TYPE ?= zynqmp
@@ -14,7 +14,7 @@ SHELL := /bin/bash
 TOOLS_ROOT ?= /opt/xilinx
 TOOLS ?= $(TOOLS_ROOT)/Vitis
 TOOLS_VERSION ?= 2020.2
-DTS_VERSION ?= 2021.1
+DTS_VERSION ?= 2021.2
 MAKE := make
 MKDIR := mkdir
 
