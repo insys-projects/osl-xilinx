@@ -1,7 +1,7 @@
 /dts-v1/;
 
 #include "fmc130e.dtsi"
-#include "fmc130e-zdev.dtsi"      /* Custom PL logic description file */
+#include "zynq-zdev.dtsi"      /* Custom PL logic description file */
 
 &gem0 {
     phy-handle = <&phy0>;

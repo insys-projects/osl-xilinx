@@ -87,7 +87,7 @@
 };
 
 &axi_pcie_0 {
-    status = "disabled";
+    status = "okay";
 };
 
 &qspi {

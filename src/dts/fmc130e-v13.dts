@@ -8,10 +8,10 @@
     ps7_ethernet_0_mdio: mdio {
         #address-cells = <0x1>;
         #size-cells = <0x0>;
-        phy0: phy@1 { /* FMC130E v 1.1 */
-            compatible = "ethernet-phy-id0282.F014";
+        phy0: phy@0 { /* FMC130E v 1.3 */
+            compatible = "marvell,88e1510";
             device_type = "ethernet-phy";
-            reg = <1>;
+            reg = <0>;
         };
     };
 };
