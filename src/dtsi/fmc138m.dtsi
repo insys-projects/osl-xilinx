@@ -1,4 +1,5 @@
 / {
+    model = "fmc138m v12";
     aliases {
         ethernet0 = &gem0;
         i2c0 = &i2c0;
@@ -33,73 +34,80 @@
 };
 
 &gem0 {
-    status = "okay";
-    phy-handle = <&phy0>;
-    phy-mode = "rgmii-id";
-    ps7_ethernet_0_mdio: mdio {
-        phy0: phy@0 {
-            device_type = "ethernet-phy";
-            reg = <0x0>;
-            marvell,reg-init =
-                /* Fix rx and tx clock transition timing */
-                <2 0x15 0xffcf 0>, /* Reg 2,21 Clear bits 4, 5 */
-                /* Coopper fifo depth */
-                <2 0x10 0 0xd448>; /* Reg 2,16 <- 0xd448 */
-            };
-    };
+	status = "okay";
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii-id";
+	ps7_ethernet_0_mdio: mdio {
+		phy0: phy@0 {
+			device_type = "ethernet-phy";
+			reg = <0x0>;
+			marvell,reg-init =
+			/* Fix rx and tx clock transition timing */
+			<2 0x15 0xffcf 0>, /* Reg 2,21 Clear bits 4, 5 */
+			/* Coopper fifo depth */
+			<2 0x10 0 0xd448>; /* Reg 2,16 <- 0xd448 */
+		};
+	};
+};
+
+&gem1 {
+	status = "okay";
+	local-mac-address = [00 0a 35 00 00 11];
+	phy-mode = "rgmii-id";
+	phy-handle = <&phy9>;
+		phy9: phy@9 {
+			/* for 1000-BASE-X mode use */
+			xlnx,phy-type = <5>;
+			/* for SGMII mode use   */
+			/* xlnx,phy-type = <4>; */
+			reset-gpios = <&gpio 78 0>;
+			reg = <0x09>;
+		};
 };
 
 &sata {
-    /* SATA OOB timing settings */
-    ceva,p0-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
-    ceva,p0-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
-    ceva,p0-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
-    ceva,p0-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
+	status = "okay";
+	/* SATA OOB timing settings */
+	ceva,p0-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
+	ceva,p0-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
+	ceva,p0-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
+	ceva,p0-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
 
-    ceva,p1-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
-    ceva,p1-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
-    ceva,p1-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
-    ceva,p1-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
-    phy-names = "sata-phy";
-    phys = <&psgtr 3 1 1 3>;
+	ceva,p1-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
+	ceva,p1-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
+	ceva,p1-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
+	ceva,p1-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
+	phy-names = "sata-phy";
+	phys = <&psgtr 3 1 1 3>;
 };
 
 &usb0 {
-    status = "okay";
-    phy_type = "ulpi";
-    dr_mode = "host";
+	status = "okay";
+	phy-names = "usb3-phy";
+	phys = <&psgtr 2 4 0 2>;
 };
 
 &usb1 {
-    status = "okay";
-    phy_type = "ulpi";
-    dr_mode = "host";
+	status = "okay";
 };
 
 &dwc3_0 {
-    status = "okay";
-    dr_mode = "host";
-    phy-names = "usb3-phy";
-    compatible = "snps,dwc3";
-    maximum-speed = "super-speed";
-    reg = <0x0 0xfe200000 0x0 0x40000>;
-    snps,quirk-frame-length-adjustment = <0x20>;
-    snps,refclk_fladj;
-    snps,enable_guctl1_resume_quirk;
-    snps,enable_guctl1_ipd_quirk;
-    snps,xhci-stream-quirk;
-    phys = <&psgtr 2 4 0 2>;
+	status = "okay";
+	dr_mode = "host";
+	snps,usb3_lpm_capable;
+	maximum-speed = "super-speed";
 };
 
 &dwc3_1 {
-    status = "okay";
-    dr_mode = "host";
-    phy-names = "usb3-phy";
-    /delete-property/ phy-names;
-    /delete-property/ phys;
-    maximum-speed = "high-speed";
-    snps,dis_u2_susphy_quirk;
-    snps,dis_u3_susphy_quirk;
+	status = "okay";
+	dr_mode = "host";
+	maximum-speed = "high-speed";
+};
+
+&zynqmp_dpsub {
+	status = "okay";
+	phy-names = "dp-phy0","dp-phy1";
+	phys = 	<&psgtr 1 6 0 0>, <&psgtr 0 6 1 0>;
 };
 
 &xdma_0 {
