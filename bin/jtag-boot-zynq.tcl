@@ -15,18 +15,19 @@ rst -processor
 targets -set -filter {name =~ "ARM*#0"}
 
 puts "Start loading fsbl"
+#dow jtag-executable.elf
 dow zynq_fsbl.elf
 puts "Complete loading fsbl"
 con
 
-after 1000
+after 500
 
 puts "Start Downloading u-boot"
 dow u-boot.elf
 puts "Downloading u-boot"
 con
 
-after 1000
+after 500
 #jtagterminal
 #after 5000
 

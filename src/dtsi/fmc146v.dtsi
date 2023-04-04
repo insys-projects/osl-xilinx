@@ -3,29 +3,6 @@
 #include "zynq-7000.dtsi"
 
 / {
-        model = "fmc131v";
-        compatble = "insys,fmc131v", "xlnx,zynq-7000";
-
-        aliases {
-                ethernet0 = &gem0;
-                ethernet1 = &gem1;
-/*                i2c0 = &axi_iic_0; */
-                i2c0 = &i2c0;
-                i2c1 = &i2c1;
-                serial0 = &uart0;
-                serial1 = &mdm_0;
-                spi0 = &qspi;
-        };
-
-        memory {
-                device_type = "memory";
-                reg = <0x0 0x40000000>;
-        };
-
-        cpus {
-                /delete-node/ cpu@1 ;
-        };
-
         chosen {
                 bootargs = "console=ttyPS0,115200 earlycon root=/dev/mmcblk0p2 rootfstype=ext4 init_fatal_sh=1 vmalloc=512MB cma=256MB";
                 stdout-path = "serial0:115200n8";
@@ -46,16 +23,12 @@
                         default-state = "on";
                 };
 
-                SDIO_SEL {
-                        label = "SDIO_SEL";
-                        gpios = <&gpio0 46 0>;
-                        default-state = "keep";
-                };
         };
-/* этот вариант работает в u-boot (в linux - нет)
+/* этот вариант работает в u-boot (в linux - нет) */
+/*
         mdio {
             compatible = "cdns,macb-mdio";
-            reg = <0xe000b000 0x1000>;
+            reg = <0xe000c000 0x1000>;
             clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
             clock-names = "pclk", "hclk", "tx_clk";
             #address-cells = <1>;
@@ -74,7 +47,8 @@
 */
 };
 
-/* этот вариант работает в u-boot (в linux - нет)
+/* этот вариант работает в u-boot (в linux - нет) */
+/*
 &gem0 {
     status = "okay";
     local-mac-address = [00 0a 35 00 01 00];
@@ -93,20 +67,19 @@
 /* этот вариант не работает с двумя PHY в u-boot, но работает в linux
    поэтому оставляем его по умолчанию. При этом в u-boot должен
    работать только gem0 */
+
 &gem0 {
     status = "okay";
     local-mac-address = [00 0a 35 00 01 00];
-    phy-mode = "rgmii-id";
+    phy-mode = "rgmii";
     phy-handle = <&phy0>;
     ps7_ethernet_0_mdio: mdio {
         #address-cells = <0x1>;
         #size-cells = <0x0>;
         phy0: phy@0 {
-            device_type = "ethernet-phy";
             reg = <0>;
         };
         phy1: phy@1 {
-            device_type = "ethernet-phy";
             reg = <1>;
         };
     };
@@ -115,14 +88,83 @@
 &gem1 {
     status = "okay";
     local-mac-address = [00 0a 35 00 01 01];
-    phy-mode = "rgmii-id";
+    phy-mode = "rgmii";
     phy-handle = <&phy1>;
 };
-/*
-&axi_iic_0 {
+
+&i2c1 {
+
     status = "okay";
+
+    i2c_mux@70 {
+
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "nxp,pca9546";
+        reg = <0x70>;
+
+        i2c@0 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+            sfp1@50 {
+                compatible = "sff,sfp";
+                reg = <0x50>;
+            };
+        };
+
+        i2c@1 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <1>;
+            event@6b {
+                compatible = "dallas,ds1682";
+                reg = <0x6b>;
+            };
+        };
+
+        i2c@2 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <2>;
+            eeprom@50 {
+                compatible = "st,24c32";
+                reg = <0x50>;
+                label = "serial";
+                read-only;
+            };
+        };
+
+        i2c@3 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <3>;
+            sm@55 {
+                reg = <0x55>;
+            };
+        };
+
+        i2c@5 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <5>;
+            plx8750@55 {
+                reg = <0x55>;
+            };
+        };
+
+        i2c@6 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <6>;
+            sfp0@50 {
+                compatible = "sff,sfp";
+                reg = <0x50>;
+            };
+        };
+    };
 };
-*/
+
 &axi_gpio_0 {
     status = "okay";
 };

@@ -13,6 +13,7 @@ zynq_dts:
 	$(RM) -r $(BOARD)-xsa; \
 	$(MKDIR) -p $(BOARD)-xsa; \
 	cp -fv ./src/dtsi/$(BOARD)*.dtsi ./$(BOARD)-dts; \
+	cp -fv ./src/dtsi/*zdev.dtsi ./$(BOARD)-dts; \
 	cp -fv ./src/dts/$(BOARD)*$(BOARD_VER).dts ./$(BOARD)-dts; \
 	cp -fv ./src/*.$(EXT) $(BOARD)-xsa; \
 	$(TOOLS)/2020.2/bin/xsct -eval "source xsct_script.tcl; zynq_dts -version $(DTS_VERSION) -board $(BOARD)"
@@ -27,6 +28,7 @@ zynq_dts:
 		mv $(BOARD)-dts/$(BOARD).tmpdtsi $(BOARD)-dts/$(BOARD).dtsi; \
 	fi
 	cp -fv $(BOARD)-dts/$(BOARD)*.dts* u-boot-xlnx/arch/arm/dts;
+	cp -fv $(BOARD)-dts/*zdev.dts* u-boot-xlnx/arch/arm/dts;
 
 zynq_dtb: zynq_dts
 	$(RM) -r system.dtb; \

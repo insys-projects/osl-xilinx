@@ -1,7 +1,7 @@
 
 / {
     axidev@83C00000 {
-        status = "okay";
+        status = "disabled";
         compatible = "insys,axidrv";
         #address-cells = <1>;
         #size-cells = <1>;
