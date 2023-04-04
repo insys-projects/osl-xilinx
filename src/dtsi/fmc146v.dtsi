@@ -1,0 +1,283 @@
+/dts-v1/;
+
+#include "zynq-7000.dtsi"
+
+/ {
+        chosen {
+                bootargs = "console=ttyPS0,115200 earlycon root=/dev/mmcblk0p2 rootfstype=ext4 init_fatal_sh=1 vmalloc=512MB cma=256MB";
+                stdout-path = "serial0:115200n8";
+        };
+
+        leds {
+                compatible = "gpio-leds";
+
+                LED_Y {
+                        label = "LED_Y";
+                        gpios = <&gpio0 48 0>;
+                        linux,default-trigger = "heartbeat";
+                };
+
+                LED_G {
+                        label = "LED_G";
+                        gpios = <&gpio0 49 0>;
+                        default-state = "on";
+                };
+
+        };
+/* этот вариант работает в u-boot (в linux - нет) */
+/*
+        mdio {
+            compatible = "cdns,macb-mdio";
+            reg = <0xe000c000 0x1000>;
+            clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+            clock-names = "pclk", "hclk", "tx_clk";
+            #address-cells = <1>;
+            #size-cells = <0>;
+            phy0: phy@0 {
+                compatible = "marvell";
+                device_type = "ethernet-phy";
+                reg = <0>;
+            };
+            phy1: phy@1 {
+                compatible = "marvell";
+                device_type = "ethernet-phy";
+                reg = <1>;
+            };
+        };
+*/
+};
+
+/* этот вариант работает в u-boot (в linux - нет) */
+/*
+&gem0 {
+    status = "okay";
+    local-mac-address = [00 0a 35 00 01 00];
+    phy-mode = "rgmii-id";
+    phy-handle = <&phy0>;
+};
+
+&gem1 {
+    status = "okay";
+    local-mac-address = [00 0a 35 00 01 01];
+    phy-mode = "rgmii-id";
+    phy-handle = <&phy1>;
+};
+*/
+
+/* этот вариант не работает с двумя PHY в u-boot, но работает в linux
+   поэтому оставляем его по умолчанию. При этом в u-boot должен
+   работать только gem0 */
+
+&gem0 {
+    status = "okay";
+    local-mac-address = [00 0a 35 00 01 00];
+    phy-mode = "rgmii";
+    phy-handle = <&phy0>;
+    ps7_ethernet_0_mdio: mdio {
+        #address-cells = <0x1>;
+        #size-cells = <0x0>;
+        phy0: phy@0 {
+            reg = <0>;
+        };
+        phy1: phy@1 {
+            reg = <1>;
+        };
+    };
+};
+
+&gem1 {
+    status = "okay";
+    local-mac-address = [00 0a 35 00 01 01];
+    phy-mode = "rgmii";
+    phy-handle = <&phy1>;
+};
+
+&i2c1 {
+
+    status = "okay";
+
+    i2c_mux@70 {
+
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "nxp,pca9546";
+        reg = <0x70>;
+
+        i2c@0 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+            sfp1@50 {
+                compatible = "sff,sfp";
+                reg = <0x50>;
+            };
+        };
+
+        i2c@1 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <1>;
+            event@6b {
+                compatible = "dallas,ds1682";
+                reg = <0x6b>;
+            };
+        };
+
+        i2c@2 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <2>;
+            eeprom@50 {
+                compatible = "st,24c32";
+                reg = <0x50>;
+                label = "serial";
+                read-only;
+            };
+        };
+
+        i2c@3 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <3>;
+            sm@55 {
+                reg = <0x55>;
+            };
+        };
+
+        i2c@5 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <5>;
+            plx8750@55 {
+                reg = <0x55>;
+            };
+        };
+
+        i2c@6 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <6>;
+            sfp0@50 {
+                compatible = "sff,sfp";
+                reg = <0x50>;
+            };
+        };
+    };
+};
+
+&axi_gpio_0 {
+    status = "okay";
+};
+
+&sdhci0 {
+        status = "okay";
+        xlnx,has-cd = <0x0>;
+        xlnx,has-power = <0x0>;
+        xlnx,has-wp = <0x0>;
+        max-frequency = <50000000>;
+        no-1-8-v;
+};
+
+&amba {
+    ptm@f889d000 {
+        cpu = <&cpu0>;
+    };
+};
+
+&uart0 {
+    status = "okay";
+};
+
+&clkc {
+    fclk-enable = <0xf>;
+};
+
+&qspi {
+
+    flash0: flash@0 {
+        compatible = "n25q512a", "micron,m25p80";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        reg = <0>;
+        spi-max-frequency = <50000000>;
+        partition@0 {
+            label = "boot";
+            reg = <0x00000000 0x00200000>;
+        };
+        partition@1 {
+            label = "bootenv";
+            reg = <0x00200000 0x00020000>;
+        };
+        partition@2 {
+            label = "kernel";
+            reg = <0x00220000 0x00d80000>;
+        };
+        partition@3 {
+            label = "spare";
+            reg = <0x00fa0000 0x00000000>;
+        };
+    };
+};
+
+&xadc_wiz_0 {
+
+    status = "okay";
+
+    xlnx,channels {
+
+        #address-cells = <0x1>;
+        #size-cells = <0x0>;
+
+        channel@0 {
+            reg = <0x0>;
+        };
+        channel@1 {
+            reg = <0x1>;
+        };
+        channel@2 {
+            reg = <0x2>;
+        };
+        channel@3 {
+            reg = <0x3>;
+        };
+        channel@4 {
+            reg = <0x4>;
+        };
+        channel@5 {
+            reg = <0x5>;
+        };
+        channel@6 {
+            reg = <0x6>;
+        };
+        channel@7 {
+            reg = <0x7>;
+        };
+        channel@8 {
+            reg = <0x8>;
+        };
+        channel@9 {
+            reg = <0x9>;
+        };
+        channel@a {
+            reg = <0xa>;
+        };
+        channel@b {
+            reg = <0xb>;
+        };
+        channel@c {
+            reg = <0xc>;
+        };
+        channel@d {
+            reg = <0xd>;
+        };
+        channel@e {
+            reg = <0xe>;
+        };
+        channel@f {
+            reg = <0xf>;
+        };
+        channel@10 {
+            reg = <0x10>;
+        };
+    };
+};
