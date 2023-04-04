@@ -22,7 +22,7 @@ proc fsblmp {args} {
 
 proc zynqmp_dts {args} {
     set board 0
-    set version 2020.2
+    set version 2021.2
     for {set i 0} {$i < [llength $args]} {incr i} {
         if {[lindex $args $i] == "-board"} {
             set board [string tolower [lindex $args [expr {$i + 1}]]]
@@ -97,7 +97,7 @@ proc fsbl {args} {
 
 proc zynq_dts {args} {
     set board 0
-    set version 2020.2
+    set version 2021.2
     for {set i 0} {$i < [llength $args]} {incr i} {
         if {[lindex $args $i] == "-board"} {
             set board [string tolower [lindex $args [expr {$i + 1}]]]
