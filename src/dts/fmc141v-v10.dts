@@ -1,6 +1,6 @@
 /dts-v1/;
 
-#include "fmc131v.dtsi"
+#include "fmc141v.dtsi"
 #include "zynq-zdev.dtsi"
 
 / {
