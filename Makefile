@@ -1,14 +1,15 @@
 
-#BOARD ?= fmc130e
-#BOARD_VER ?= v12
+BOARD ?= fmc130e
+BOARD_VER ?= v12
 #BOARD ?= fmc133v
 #BOARD_VER ?= v12
-BOARD ?= fmc138m
-BOARD_VER ?= v12
+#BOARD ?= fmc138m
+#BOARD_VER ?= v12
 
-#SOC_TYPE ?= zynq
-SOC_TYPE ?= zynqmp
-HDF_EXT ?= xsa
+SOC_TYPE ?= zynq
+#SOC_TYPE ?= zynqmp
+HDF_EXT ?= hdf
+#HDF_EXT ?= xsa
 
 SHELL := /bin/bash
 TOOLS_ROOT ?= /opt/xilinx
